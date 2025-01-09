@@ -1,9 +1,6 @@
-import { canvas, context, isInRect } from './modules/canvas.js';
-import Graph from './modules/graph.js';
-import './modules/context-menu.js';
-
-const graph = new Graph(50);
-let selection;
+import { canvas, isInRect, draw } from './modules/canvas.js';
+import { graph } from './modules/graph.js';
+import { closeContextMenu } from './modules/context-menu.js';
 
 function resize() {
     canvas.width = window.innerWidth;
@@ -11,59 +8,48 @@ function resize() {
     draw();
 }
 
-function draw() {
-    context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    graph.drawEdges();
-    graph.drawNodes();
-}
-
 function move(e) {
-    if (selection && e.buttons && isInRect(e.x, e.y)) {
-        selection.x = e.x;
-        selection.y = e.y;
+    let toDraw = false;
+    if (graph.tmpEdge) {
+        graph.tmpEdge.to = e;
+        toDraw = true;
+    }
+    if (graph.sel && e.buttons && isInRect(e.x, e.y)) {
+        graph.sel.x = e.x;
+        graph.sel.y = e.y;
+        toDraw = true;
+    }
+    if (toDraw) {
         draw();
     }
 }
 
 function down(e) {
+    if (e.button !== 0) {
+        return;
+    }
     let target = graph.getNodeWithin(e.x, e.y);
-    if (selection?.selected) {
-        selection.selected = false;
-    }
     if (target) {
-        if (selection && selection !== target) {
-            graph.addEdge(selection, target);
+        graph.sel = target;
+        if (graph.tmpEdge) {
+            graph.addEdge(graph.tmpEdge.from, graph.sel);
+            graph.tmpEdge = undefined;
         }
-        selection = target;
-        selection.selected = true;
         draw();
+    } else {
+        graph.tmpEdge = undefined;
     }
 }
 
-function up(e) {
-    if (!selection && isInRect(e.x, e.y)) {
-        graph.addNode(e);
-        draw();
-    }
-    if (selection && !selection.selected) {
-        selection = undefined;
-    }
+function up() {
+    closeContextMenu();
+    graph.sel = undefined;
     draw();
-}
-
-function deleteNode(e) {
-    if (selection && e.key === 'Delete') {
-        const id = selection.id;
-        graph.removeNode(id);
-        selection = undefined;
-        draw();
-    }
 }
 
 window.onresize = resize;
 resize();
 
-window.onkeydown = deleteNode;
 window.onmousemove = move;
 window.onmousedown = down;
 window.onmouseup = up;

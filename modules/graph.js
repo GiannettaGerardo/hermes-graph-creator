@@ -1,33 +1,43 @@
-import { context, RADIUS, drawArrowhead } from './canvas.js';
+import { context, RADIUS, drawArrowhead, drawArrowheadSimple } from './canvas.js';
 
-export default class Graph {
+class Graph {
     #idCounter;
     #capacity;
-    #idx;
+    #edgesCapacity;
+    #nIdx;
     #nodes;
+    #eIdx;
+    #edges;
+    sel;
+    tmpEdge;
 
-    constructor(maxCapacity) {
-        if (maxCapacity <= 0) {
-            throw new Error('Graph maxCapacity must be grater than ZERO.');
+    constructor(nodeCapacity, edgeLimit) {
+        if (nodeCapacity <= 0) {
+            throw new Error('Graph nodeCapacity must be grater than ZERO.');
         }
-        this.#capacity = maxCapacity;
+        this.#capacity = nodeCapacity;
         this.#idCounter = 0;
-        this.#nodes = new Array(maxCapacity);
-        this.#nodes.fill(null, 0, this.#nodes.length);
-        this.#idx = -1;
+        this.sel = undefined;
+        this.tmpEdge = undefined;
+
+        this.#nodes = new Array(nodeCapacity);
+        this.#nodes.fill(null, 0, nodeCapacity);
+        this.#nIdx = -1;
+
+        this.#edgesCapacity = nodeCapacity * (nodeCapacity - 1);
+        if (this.#edgesCapacity > edgeLimit) {
+            this.#edgesCapacity = edgeLimit;
+        }
+        this.#edges = new Array(this.#edgesCapacity);
+        this.#edges.fill(null, 0, this.#edgesCapacity);
+        this.#eIdx = -1;
     }
 
-    addNode(event) {
-        if (this.#idx + 1 >= this.#capacity) {
+    addNode(x, y) {
+        if (this.#nIdx + 1 >= this.#capacity) {
             return false;
         }
-        this.#nodes[++this.#idx] = {
-            id: this.#idCounter++,
-            x: event.x,
-            y: event.y,
-            selected: false,
-            to: new Array()
-        };
+        this.#nodes[++this.#nIdx] = { id: this.#idCounter++, x, y };
         return true;
     }
 
@@ -35,14 +45,14 @@ export default class Graph {
         if (nodeId < 0 || nodeId > this.#idCounter) {
             return false;
         }
-        const size = this.#idx + 1;
+        const size = this.#nIdx + 1;
         const nodes = this.#nodes;
         for (let i = 0; i < size; ++i) {
             if (nodes[i].id === nodeId) {
-                this.#removeEdgesByNode(nodes[i]);
-                nodes[i] = nodes[this.#idx];
-                nodes[this.#idx] = null;
-                --this.#idx;
+                this.removeEdgesByNode(nodes[i]);
+                nodes[i] = nodes[this.#nIdx];
+                nodes[this.#nIdx] = null;
+                --this.#nIdx;
                 return true;
             }
         }
@@ -50,7 +60,7 @@ export default class Graph {
     }
 
     getNodeWithin(x, y) {
-        const size = this.#idx + 1;
+        const size = this.#nIdx + 1;
         const nodes = this.#nodes;
         for (let i = 0; i < size; ++i) {
             const n = nodes[i];
@@ -64,14 +74,14 @@ export default class Graph {
     }
 
     drawNodes() {
-        const size = this.#idx + 1;
+        const size = this.#nIdx + 1;
         const nodes = this.#nodes;
         context.save();
         context.strokeStyle = '#009999';
         for (let i = 0; i < size; ++i) {
             const node = nodes[i];
             context.beginPath();
-            context.fillStyle = node.selected ? '#88aaaa' : '#22cccc';
+            context.fillStyle = node === this.sel ? '#88aaaa' : '#22cccc';
             context.arc(node.x, node.y, RADIUS, 0, Math.PI * 2, true);
             context.fill();
             context.stroke();
@@ -79,51 +89,68 @@ export default class Graph {
         context.restore();
     }
 
-    drawEdges() {
-        const size = this.#idx + 1;
-        const nodes = this.#nodes;
+    drawTmpEdge() {
+        if (!this.tmpEdge) {
+            return;
+        }
+        let { from, to } = this.tmpEdge;
         context.save();
         context.strokeStyle = '#ccaf56';
         context.lineWidth = 2;
-        for (let i = 0; i < size; ++i) {
-            const node = nodes[i];
-            for (const edge of node.to) {
-                context.beginPath();
-                context.moveTo(node.x, node.y);
-                context.lineTo(edge.x, edge.y);
-                drawArrowhead(node.x, node.y, edge.x, edge.y);
-                context.stroke();
-            }
+        context.beginPath();
+        context.moveTo(from.x, from.y);
+        context.lineTo(to.x, to.y);
+        drawArrowheadSimple(from.x, from.y, to.x, to.y);
+        context.stroke();
+        context.restore();
+    }
+
+    drawEdges() {
+        const edges = this.#edges;
+        let i = 0;
+        context.save();
+        context.strokeStyle = '#ccaf56';
+        context.lineWidth = 2;
+        while (edges[i] !== null) {
+            let { from, to } = edges[i]
+            context.beginPath();
+            context.moveTo(from.x, from.y);
+            context.lineTo(to.x, to.y);
+            drawArrowhead(from.x, from.y, to.x, to.y);
+            context.stroke();
+            ++i;
         }
         context.restore();
     }
 
     addEdge(from, to) {
-        const size = this.#idx + 1;
-        const nodes = this.#nodes;
-        for (let i = 0; i < size; ++i) {
-            if (nodes[i] === from) {
-                if (nodes[i].to.find(n => n === to)) {
-                    return false;
-                }
-                nodes[i].to.push(to);
-                return true;
+        if (this.#eIdx + 1 >= this.#edgesCapacity
+            || from === to) {
+            return false;
+        }
+        const edges = this.#edges;
+        let i = 0, edge;
+        while ((edge = edges[i++]) !== null) {
+            if (edge.from === from && edge.to === to) {
+                return false;
             }
         }
-        return false;
+        this.#edges[++this.#eIdx] = { from, to };
+        return true;
     }
 
-    #removeEdgesByNode(node) {
-        let edgeIdx;
-        const nodeId = node.id;
-        const size = this.#idx + 1;
-        const nodes = this.#nodes;
-        for (let i = 0; i < size; ++i) {
-            if (nodes[i].id !== nodeId 
-                && (edgeIdx = nodes[i].to.findIndex(n => n === node)) !== -1) {
-                nodes[i].to.splice(edgeIdx, 1);
+    removeEdgesByNode(node) {
+        const edges = this.#edges;
+        let i = 0;
+        while (edges[i] !== null) {
+            if (edges[i].from === node || edges[i].to === node) {
+                edges[i] = edges[this.#eIdx];
+                edges[this.#eIdx] = null;
+                --this.#eIdx;
             }
+            else { ++i; }
         }
-    }
+    } 
 }
 
+export const graph = new Graph(50, 100);

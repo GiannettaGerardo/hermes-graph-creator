@@ -4,36 +4,26 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hermes / Graph Creator</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="index.css">
     <script type="module" src="main.js"></script>
 </head>
 <body>
-    <nav id="navbar" class="navbar navbar-expand-lg" style="background-color: #ccaf56; position: absolute; width: 100%;">
-        <div class="container-fluid">
-            <div class="navbar-brand">Hermes / Graph Creator</div>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarText">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
-                <span class="navbar-text">
-                    Select a Node and use CANC button to delete it
-                </span>
-            </div>
-        </div>
+    <nav id="navbar">
+        <span id="title">Hermes / Graph Creator</span>
+        <span style="padding-right: 10px;">Right Click to use Contextual Menu</span>
     </nav>
+
     <canvas id="myCanvas">
         Sorry, your browser does not support canvas.
     </canvas>
-    <div id="contextMenu" class="dropdown" style="position: absolute;">
-        <button data-bs-toggle="dropdown" style="visibility: hidden;"></button>
-        <ul class="dropdown-menu">
-            <li><h6 class="dropdown-header">Contextual actions</h6></li>
-            <li><button class="dropdown-item" type="button">New node</button></li>
-            <li><button class="dropdown-item" type="button">Delete node</button></li>
+
+    <div id="contextMenu">
+        <div class="contextMenuHeader">Contextual Actions</div>
+        <ul style="list-style: none;">
+            <li><button id="new-node-btn" class="ctx-menu-btn button">New node</button></li>
+            <li><button id="new-edge-btn" class="ctx-menu-btn button">New edge</button></li>
+            <li><button id="delete-node-btn" class="ctx-menu-btn button">Delete node</button></li>
         </ul>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

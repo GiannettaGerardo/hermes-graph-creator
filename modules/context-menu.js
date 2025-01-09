@@ -1,57 +1,47 @@
-import { canvas } from './canvas.js';
+import { canvas, isInRect, draw } from './canvas.js';
+import { graph } from './graph.js';
 
-const { mainDiv, dropdownBtn } = createContextMenu();
+const contextMenuStyle = document.getElementById('contextMenu').style;
+const newNodeBtn = document.getElementById('new-node-btn');
+const newEdgeBtn = document.getElementById('new-edge-btn');
+const deleteNodeBtn = document.getElementById('delete-node-btn');
+let ctxMenuX = 0;
+let ctxMenuY = 0;
 
 canvas.addEventListener('contextmenu', ev => {
     ev.preventDefault();
-    setPosition(ev.x, ev.y);
-    dropdownBtn.update();
-    dropdownBtn.show();
-})
+    ctxMenuX = ev.x;
+    ctxMenuY = ev.y;
+    contextMenuStyle.left = ctxMenuX + 'px';
+    contextMenuStyle.top =  ctxMenuY + 'px';
+    contextMenuStyle.visibility = 'visible';
+});
 
-function setPosition(x, y) {
-    mainDiv.style.left = x + 'px';
-    mainDiv.style.top =  (y - 20) + 'px';
-}
+newNodeBtn.addEventListener('click', () => {
+    const targetNode = graph.getNodeWithin(ctxMenuX, ctxMenuY);
+    if (!targetNode && isInRect(ctxMenuX, ctxMenuY)) {
+        graph.addNode(ctxMenuX, ctxMenuY);
+        draw();
+    }
+});
 
-function createContextMenu() {
-    /*const mainDiv = document.createElement('div');
-    mainDiv.setAttribute('class', 'dropdown');
-    mainDiv.setAttribute('id', 'contextMenu');
-    mainDiv.style.position = 'absolute';
+newEdgeBtn.addEventListener('click', ev => {
+    const targetNode = graph.getNodeWithin(ctxMenuX, ctxMenuY);
+    if (targetNode) {
+        graph.tmpEdge = { from: targetNode, to: ev }
+        draw();
+    }
+});
 
-    const hiddenBtn = document.createElement('button');
-    hiddenBtn.setAttribute('data-bs-toggle', 'dropdown');
-    hiddenBtn.style.visibility = 'hidden';
-  
-    const ul = document.createElement('ul');
-    ul.setAttribute('class', 'dropdown-menu');
-  
-    let li = document.createElement('li');
-    let h6 = document.createElement('h6');
-    h6.setAttribute('class', 'dropdown-header');
-    h6.innerText = 'Contextual actions';
-    li.appendChild(h6);
-    ul.appendChild(li);
+deleteNodeBtn.addEventListener('click', () => {
+    const targetNode = graph.getNodeWithin(ctxMenuX, ctxMenuY);
+    if (targetNode) {
+        graph.removeNode(targetNode.id);
+        graph.sel = undefined;
+        draw();
+    }
+});
 
-    li = document.createElement('li');
-    let btn = document.createElement('button');
-    btn.setAttribute('class', 'dropdown-item');
-    btn.innerText = 'New node';
-    li.appendChild(btn);
-    ul.appendChild(li);
-
-    li = document.createElement('li');
-    btn = document.createElement('button');
-    btn.setAttribute('class', 'dropdown-item');
-    btn.innerText = 'Delete node';
-    li.appendChild(btn);
-    ul.appendChild(li);
-
-    mainDiv.appendChild(hiddenBtn);
-    mainDiv.appendChild(ul);*/
-
-    const mainDiv = document.getElementById('contextMenu');
-    document.body.appendChild(mainDiv);
-    return { mainDiv, dropdownBtn: new bootstrap.Dropdown(mainDiv.firstElementChild) };
+export function closeContextMenu() {
+    contextMenuStyle.visibility = 'hidden';
 }
