@@ -11,6 +11,7 @@ class Graph {
     #edges;
     #selection;
     tmpEdge;
+    nodeTypes;
 
     constructor(nodeCapacity, edgeLimit) {
         if (nodeCapacity <= 0) {
@@ -32,13 +33,21 @@ class Graph {
         this.#edges = new Array(this.#edgesCapacity);
         this.#edges.fill(null, 0, this.#edgesCapacity);
         this.#eIdx = -1;
+        this.nodeTypes = ['TASK', 'FORWARD', 'JOIN', 'ENDING'];
     }
 
     addNode(x, y) {
         if (this.#nIdx + 1 >= this.#capacity) {
             return false;
         }
-        this.#nodes[++this.#nIdx] = { id: this.#idCounter++, x, y };
+        this.#nodes[++this.#nIdx] = { 
+            id: this.#idCounter, 
+            name: this.#idCounter,
+            description: null,
+            type: 'TASK',
+            x, y 
+        };
+        ++this.#idCounter;
         return true;
     }
 
@@ -77,6 +86,7 @@ class Graph {
     newSelection(node) {
         if (!node) { return }
         this.#selection = node;
+        sidebar.addEditorByNode(node);
         sidebar.addEdgesByNode(node);
     }
 
@@ -93,7 +103,9 @@ class Graph {
         const size = this.#nIdx + 1;
         const nodes = this.#nodes;
         context.save();
-        context.font = "25px consolas";
+        context.font = "20px consolas";
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
         for (let i = 0; i < size; ++i) {
             const node = nodes[i];
             context.beginPath();
@@ -103,7 +115,7 @@ class Graph {
             context.fill();
             context.stroke();
             context.fillStyle = '#000000';
-            context.fillText(node.id, node.x-7, node.y+8);
+            context.fillText(node.id, node.x, node.y);
         }
         context.restore();
     }

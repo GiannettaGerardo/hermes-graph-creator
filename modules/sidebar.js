@@ -45,6 +45,103 @@ class Sidebar {
             this.#sidebar.appendChild(div);
         }
     }
+
+    addEditorByNode(node) {
+        const div = document.createElement('div');
+        div.setAttribute('class', 'bar-item');
+
+        Sidebar.addNodeNameEditor(div, node);
+        Sidebar.addDoubleNewLine(div);
+        Sidebar.addNodeDescEditor(div, node);
+        Sidebar.addDoubleNewLine(div);
+        Sidebar.addNodeTypeEditor(div, node);
+
+        this.#sidebar.appendChild(div);
+    }
+
+    static addDoubleNewLine(div) {
+        div.appendChild(document.createElement('br'));
+        div.appendChild(document.createElement('br'));
+    }
+
+    static addNodeNameEditor(div, node) {
+        const id = 'enn' + node.id; // Edit Node Name (enn)
+        
+        const label = document.createElement('label');
+        label.htmlFor = id;
+        label.innerText = 'Node name: ';
+        label.style.fontWeight = 'bold';
+        div.appendChild(label);
+        div.appendChild(document.createElement('br'));
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = id;
+        input.value = node.name;
+        input.style.width = '100%';
+        input.addEventListener('input', () => {
+            node.name = input.value;
+        });
+        div.appendChild(input);
+    }
+
+    static addNodeDescEditor(div, node) {
+        const id = 'end' + node.id; // Edit Node Description (end)
+        
+        const label = document.createElement('label');
+        label.htmlFor = id;
+        label.innerText = 'Node description: ';
+        label.style.fontWeight = 'bold';
+        div.appendChild(label);
+
+        const input = document.createElement('textarea');
+        input.id = id;
+        input.value = node.description;
+        input.style.width = '100%';
+        input.addEventListener('input', () => {
+            node.description = input.value;
+        });
+        div.appendChild(input);
+    }
+
+    static addNodeTypeEditor(div, node) {
+        const label = document.createElement('div');
+        label.innerText = 'Node type:';
+        label.style.fontWeight = 'bold';
+        label.style.marginBottom = '3px';
+        div.appendChild(label);
+
+        const nodeTypes = graph.nodeTypes;
+        const size = nodeTypes.length;
+        for (let i = 0; i < size; ++i) {
+            const type = nodeTypes[i]
+
+            const input = document.createElement('input');
+            input.type = 'radio';
+            input.id = type;
+            input.value = type;
+            input.name = 'nodetype';
+            input.checked = node.type === type;
+            input.style.width = '20px';
+            input.style.height = '20px';
+            input.style.verticalAlign = 'middle';
+            input.addEventListener('input', () => {
+                node.type = input.value;
+            });
+            div.appendChild(input);
+
+            const label = document.createElement('label');
+            label.htmlFor = type;
+            label.innerText = ' ' + type;
+            label.style.fontSize = '14px';
+            label.style.verticalAlign = 'middle';
+            div.appendChild(label);
+
+            if (i < size - 1) {
+                div.appendChild(document.createElement('br'));
+            }
+        }
+    }
     
     clear() {
         const nodes = this.#sidebar.childNodes;

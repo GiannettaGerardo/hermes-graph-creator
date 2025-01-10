@@ -52,8 +52,5 @@ window.onresize = resize;
 resize();
 
 canvas.addEventListener('mousemove', move);
-//window.onmousemove = move;
 canvas.addEventListener('mousedown', down);
-//window.onmousedown = down;
 canvas.addEventListener('mouseup', up);
-//window.onmouseup = up;
