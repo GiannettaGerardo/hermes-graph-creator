@@ -8,14 +8,27 @@
     <script type="module" src="main.js"></script>
 </head>
 <body>
-    <nav id="navbar">
-        <span id="title">Hermes / Graph Creator</span>
-        <span style="padding-right: 10px;">Right Click to use Contextual Menu</span>
-    </nav>
+    <div id="sidebar">
+        <div class="bar-item" style="display: inline-flex; gap: 30px;">
+            <h3>Sidebar Menu</h3>
+            <button id="export-btn">Export</button>
+        </div>
+        
+        <!--<a href="#" class="bar-item">Link 1</a>
+        <a href="#" class="bar-item">Link 2</a>
+        <a href="#" class="bar-item">Link 3</a>
+        <a href="#" class="bar-item">Link 1</a>
+        <a href="#" class="bar-item">Link 2</a>
+        <a href="#" class="bar-item">Link 3</a>
+        <a href="#" class="bar-item">Link 1</a>
+        <a href="#" class="bar-item">Link 2</a>
+        <a href="#" class="bar-item">Link 3</a>
+        <a href="#" class="bar-item">Link 1</a>
+        <a href="#" class="bar-item">Link 2</a>
+        <a href="#" class="bar-item">Link 3</a>-->
+    </div>
 
-    <canvas id="myCanvas">
-        Sorry, your browser does not support canvas.
-    </canvas>
+    <canvas id="myCanvas">Sorry, your browser does not support canvas.</canvas>
 
     <div id="contextMenu">
         <div class="contextMenuHeader">Contextual Actions</div>
@@ -25,5 +38,10 @@
             <li><button id="delete-node-btn" class="ctx-menu-btn button">Delete node</button></li>
         </ul>
     </div>
+
+    <nav id="navbar">
+        <span id="title">Hermes / Graph Creator</span>
+        <span style="margin-right: 15px;">Right Click to use Contextual Menu</span>
+    </nav>
 </body>
 </html>

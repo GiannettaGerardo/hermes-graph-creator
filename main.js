@@ -1,4 +1,4 @@
-import { canvas, isInRect, draw } from './modules/canvas.js';
+import { canvas, draw } from './modules/canvas.js';
 import { graph } from './modules/graph.js';
 import { closeContextMenu } from './modules/context-menu.js';
 
@@ -14,9 +14,10 @@ function move(e) {
         graph.tmpEdge.to = e;
         toDraw = true;
     }
-    if (graph.sel && e.buttons && isInRect(e.x, e.y)) {
-        graph.sel.x = e.x;
-        graph.sel.y = e.y;
+    const selection = graph.getSelection();
+    if (selection && e.buttons) {
+        selection.x = e.x;
+        selection.y = e.y;
         toDraw = true;
     }
     if (toDraw) {
@@ -25,14 +26,15 @@ function move(e) {
 }
 
 function down(e) {
-    if (e.button !== 0) {
+    graph.resetSelection();
+    if (e.button === 1) {
         return;
     }
     let target = graph.getNodeWithin(e.x, e.y);
     if (target) {
-        graph.sel = target;
+        graph.newSelection(target);
         if (graph.tmpEdge) {
-            graph.addEdge(graph.tmpEdge.from, graph.sel);
+            graph.addEdge(graph.tmpEdge.from, graph.getSelection());
             graph.tmpEdge = undefined;
         }
         draw();
@@ -43,13 +45,15 @@ function down(e) {
 
 function up() {
     closeContextMenu();
-    graph.sel = undefined;
     draw();
 }
 
 window.onresize = resize;
 resize();
 
-window.onmousemove = move;
-window.onmousedown = down;
-window.onmouseup = up;
+canvas.addEventListener('mousemove', move);
+//window.onmousemove = move;
+canvas.addEventListener('mousedown', down);
+//window.onmousedown = down;
+canvas.addEventListener('mouseup', up);
+//window.onmouseup = up;

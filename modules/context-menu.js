@@ -1,4 +1,4 @@
-import { canvas, isInRect, draw } from './canvas.js';
+import { canvas, draw } from './canvas.js';
 import { graph } from './graph.js';
 
 const contextMenuStyle = document.getElementById('contextMenu').style;
@@ -19,7 +19,8 @@ canvas.addEventListener('contextmenu', ev => {
 
 newNodeBtn.addEventListener('click', () => {
     const targetNode = graph.getNodeWithin(ctxMenuX, ctxMenuY);
-    if (!targetNode && isInRect(ctxMenuX, ctxMenuY)) {
+    closeContextMenu();
+    if (!targetNode) {
         graph.addNode(ctxMenuX, ctxMenuY);
         draw();
     }
@@ -27,6 +28,7 @@ newNodeBtn.addEventListener('click', () => {
 
 newEdgeBtn.addEventListener('click', ev => {
     const targetNode = graph.getNodeWithin(ctxMenuX, ctxMenuY);
+    closeContextMenu();
     if (targetNode) {
         graph.tmpEdge = { from: targetNode, to: ev }
         draw();
@@ -35,9 +37,10 @@ newEdgeBtn.addEventListener('click', ev => {
 
 deleteNodeBtn.addEventListener('click', () => {
     const targetNode = graph.getNodeWithin(ctxMenuX, ctxMenuY);
+    closeContextMenu();
     if (targetNode) {
         graph.removeNode(targetNode.id);
-        graph.sel = undefined;
+        graph.resetSelection();
         draw();
     }
 });

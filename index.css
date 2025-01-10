@@ -27,7 +27,7 @@ html, body {
 }
 
 #title {
-    padding-left: 10px; 
+    margin-left: 10px;
     font-size: 18px; 
     font-weight: 700;
 }
@@ -82,4 +82,26 @@ html, body {
 
 .button:hover {
     background-color: #ffda6b;
+}
+
+#sidebar { 
+    height: calc(100vh - 40px);
+    position: absolute !important;
+    width: 300px;
+    top: 40px;
+    background-color:#cecece;
+    overflow-y: scroll;
+    scrollbar-color: #ccaf56 #cecece;
+    scrollbar-width: thin;
+    border-right: solid 3px #ccaf56;
+}
+
+.bar-item {
+    display: block;
+    padding: 8px 16px;
+    text-align: left;
+    border: none;
+    white-space: normal;
+    float: none;
+    outline: 0;
 }

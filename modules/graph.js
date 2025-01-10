@@ -1,4 +1,5 @@
 import { context, RADIUS, drawArrowhead, drawArrowheadSimple } from './canvas.js';
+import { sidebar } from './sidebar.js';
 
 class Graph {
     #idCounter;
@@ -8,7 +9,7 @@ class Graph {
     #nodes;
     #eIdx;
     #edges;
-    sel;
+    #selection;
     tmpEdge;
 
     constructor(nodeCapacity, edgeLimit) {
@@ -17,7 +18,7 @@ class Graph {
         }
         this.#capacity = nodeCapacity;
         this.#idCounter = 0;
-        this.sel = undefined;
+        this.#selection = undefined;
         this.tmpEdge = undefined;
 
         this.#nodes = new Array(nodeCapacity);
@@ -73,18 +74,36 @@ class Graph {
         return null;
     }
 
+    newSelection(node) {
+        if (!node) { return }
+        this.#selection = node;
+        sidebar.addEdgesByNode(node);
+    }
+
+    getSelection() {
+        return this.#selection;
+    }
+
+    resetSelection() {
+        this.#selection = undefined;
+        sidebar.clear();
+    }
+
     drawNodes() {
         const size = this.#nIdx + 1;
         const nodes = this.#nodes;
         context.save();
-        context.strokeStyle = '#009999';
+        context.font = "25px consolas";
         for (let i = 0; i < size; ++i) {
             const node = nodes[i];
             context.beginPath();
-            context.fillStyle = node === this.sel ? '#88aaaa' : '#22cccc';
+            context.strokeStyle = '#009999';
+            context.fillStyle = node === this.#selection ? '#88aaaa' : '#22cccc';
             context.arc(node.x, node.y, RADIUS, 0, Math.PI * 2, true);
             context.fill();
             context.stroke();
+            context.fillStyle = '#000000';
+            context.fillText(node.id, node.x-7, node.y+8);
         }
         context.restore();
     }
@@ -139,6 +158,34 @@ class Graph {
         return true;
     }
 
+    getEdgesByNode(node) {
+        const edges = this.#edges;
+        let i = 0;
+        const nodeEdges = [];
+        while (edges[i] !== null) {
+            if (edges[i].from === node) {
+                nodeEdges.push(edges[i]);
+            }
+            ++i;
+        }
+        return nodeEdges;
+    }
+
+    removeEdge(edge) {
+        const edges = this.#edges;
+        let i = 0;
+        while (edges[i] !== null) {
+            if (edges[i].from === edge.from && edges[i].to === edge.to) {
+                edges[i] = edges[this.#eIdx];
+                edges[this.#eIdx] = null;
+                --this.#eIdx;
+                return true;
+            }
+            ++i;
+        }
+        return false;
+    }
+
     removeEdgesByNode(node) {
         const edges = this.#edges;
         let i = 0;
@@ -150,6 +197,19 @@ class Graph {
             }
             else { ++i; }
         }
+    }
+
+    exportToJson() {
+        return JSON.stringify({
+            nodes: this.#nodes,
+            edges: this.#edges.map(e => {
+                if (e) {
+                    return {from: e.from.id, to: e.to.id}
+                }
+                return null;
+            }),
+            idCounter: this.#idCounter
+        });
     } 
 }
 

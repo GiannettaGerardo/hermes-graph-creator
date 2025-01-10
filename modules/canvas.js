@@ -4,12 +4,6 @@ export const canvas = document.getElementById('myCanvas');
 export const context = canvas.getContext('2d');
 export const RADIUS = 20;
 
-const MAIN_Y = 48;
-
-export function isInRect(x, y) {
-    return y > MAIN_Y && x > 0 && y < canvas.height && x < canvas.width;
-}
-
 export function drawArrowhead(x0, y0, x1, y1) {
     const r = 17; // the radius of the arrowhead. This controls how "thick" the arrowhead looks.
     const distance = Math.sqrt(((x1 - x0) * (x1 - x0)) + ((y1 - y0) * (y1 - y0)));
