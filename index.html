@@ -13,6 +13,27 @@
             <h3>Options</h3>
             <button id="export-btn">Export</button>
         </div>
+
+        <div id="node-info" class="bar-item" style="visibility: hidden">
+            <label for="enn" style="font-weight: bold">Node name:</label><br>
+            <input id="enn" type="text" style="width: 100%">
+            <br><br>
+            <label for="end" style="font-weight: bold">Node description:</label><br>
+            <textarea id="end" style="width: 100%"></textarea>
+            <br><br>
+            <div style="font-weight: bold; margin-bottom: 3px;">Node type:</div>
+            <input id="TASK" type="radio" name="nodetype" value="TASK" class="radio">
+            <label for="TASK" class="radio-label">TASK</label>
+            <br>
+            <input id="FORWARD" type="radio" name="nodetype" value="FORWARD" class="radio">
+            <label for="FORWARD" class="radio-label">FORWARD</label>
+            <br>
+            <input id="JOIN" type="radio" name="nodetype" value="JOIN" class="radio">
+            <label for="JOIN" class="radio-label">JOIN</label>
+            <br>
+            <input id="ENDING" type="radio" name="nodetype" value="ENDING" class="radio">
+            <label for="ENDING" class="radio-label">ENDING</label>
+        </div>
     </div>
 
     <canvas id="myCanvas">Sorry, your browser does not support canvas.</canvas>
